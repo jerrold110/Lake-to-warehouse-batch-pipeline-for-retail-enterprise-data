@@ -1,50 +1,64 @@
 services:
-  # https://docs.docker.com/compose/networking/
-  # Containers reference other containers by the container port on the compose network, vv for host
   spark-master:
-    image: own-spark:3.4.0
-    ports:
-      - "9090:8080"
-      - "7077:7077"
-    volumes:
-       - ./apps:/opt/spark-apps
-       - ./data:/opt/spark-data
+    image: bitnami/spark:3.0.0
+    container_name: spark_master
     environment:
-      - SPARK_LOCAL_IP=spark-master
-      - SPARK_WORKLOAD=master
+      - SPARK_MODE=master
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_DRIVER_MEMORY=1G
+      - SPARK_EXECUTOR_MEMORY=1G
+      - AWS_ACCESS_KEY_ID=_
+      - AWS_SECRET_ACCESS_KEY=_
+      - AWS_DEFAULT_REGION=ap-southeast-1
+    command:
+      #
+    ports:
+      - "8080:8080" # Master web ui
+      - "7077:7077" # Master port
+    volumes:
+       - ./spark/scripts:/opt/bitnami/spark/pyspark_scripts
+       - ./spark/logs:/opt/bitnami/spark/logs
+  
   spark-worker-a:
-    image: own-spark:3.4.0
-    ports:
-      - "9091:8080"
-      - "7000:7000"
-    depends_on:
-      - spark-master
+    image: bitnami/spark:3.0.0
     environment:
-      - SPARK_MASTER=spark://spark-master:7077
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
       - SPARK_WORKER_CORES=1
       - SPARK_WORKER_MEMORY=1G
       - SPARK_DRIVER_MEMORY=1G
       - SPARK_EXECUTOR_MEMORY=1G
-      - SPARK_WORKLOAD=worker
-      - SPARK_LOCAL_IP=spark-worker-a
-    volumes:
-       - ./apps:/opt/spark-apps
-       - ./data:/opt/spark-data
+    command:
+      #
+    depends_on:
+      - spark-master
+
   spark-worker-b:
-    image: own-spark:3.4.0
-    ports:
-      - "9092:8080"
-      - "7001:7000"
-    depends_on:
-      - spark-master
+    image: bitnami/spark:3.0.0
     environment:
-      - SPARK_MASTER=spark://spark-master:7077
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
       - SPARK_WORKER_CORES=1
       - SPARK_WORKER_MEMORY=1G
       - SPARK_DRIVER_MEMORY=1G
       - SPARK_EXECUTOR_MEMORY=1G
-      - SPARK_WORKLOAD=worker
-      - SPARK_LOCAL_IP=spark-worker-b
-    volumes:
-        - ./apps:/opt/spark-apps
-        - ./data:/opt/spark-data
+    command:
+      #
+    depends_on:
+      - spark-master
+
+  spark-worker-c:
+    image: bitnami/spark:3.0.0
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_DRIVER_MEMORY=1G
+      - SPARK_EXECUTOR_MEMORY=1G
+    command:
+      #
+    depends_on:
+      - spark-master
+
