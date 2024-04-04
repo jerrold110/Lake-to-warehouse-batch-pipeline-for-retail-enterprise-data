@@ -1,25 +1,47 @@
 services:
-  spark-master:
-    image: bitnami/spark:3.0.0
-    container_name: spark_master
+  db:
+    image: postgres:14.5
+    container_name: postgres_c
+    restart: always
+    # set shared memory limit when using docker-compose
+    shm_size: 128mb
     environment:
-      - SPARK_MODE=master
-      - SPARK_WORKER_CORES=1
-      - SPARK_WORKER_MEMORY=1G
-      - SPARK_DRIVER_MEMORY=1G
-      - SPARK_EXECUTOR_MEMORY=1G
-      - AWS_ACCESS_KEY_ID= 
-      - AWS_SECRET_ACCESS_KEY= 
-      - AWS_DEFAULT_REGION=ap-southeast-1
-    command:
-      #
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=abc
     ports:
-      - "8080:8080" # Master web ui
-      - "7077:7077" # Master port
+      - 5432:5432
     volumes:
-       - ./spark/scripts:/opt/bitnami/spark/pyspark_scripts
-       - ./spark/logs:/opt/bitnami/spark/logs
-       - ./spark/db_connectors:/opt/bitnami/spark/db_connectors
+       - ./database/scripts:/psql_scripts
+       - ./database/config:/tmp
+
+  adminer:
+    image: adminer
+    container_name: adminer_c
+    restart: always
+    ports:
+      - 8080:8080
+      
+  # spark-master:
+  #   image: bitnami/spark:3.0.0
+  #   container_name: spark_master
+  #   environment:
+  #     - SPARK_MODE=master
+  #     - SPARK_WORKER_CORES=1
+  #     - SPARK_WORKER_MEMORY=1G
+  #     - SPARK_DRIVER_MEMORY=1G
+  #     - SPARK_EXECUTOR_MEMORY=1G
+  #     - AWS_ACCESS_KEY_ID= 
+  #     - AWS_SECRET_ACCESS_KEY= 
+  #     - AWS_DEFAULT_REGION=ap-southeast-1
+  #   command:
+  #     #
+  #   ports:
+  #     - "8080:8080" # Master web ui
+  #     - "7077:7077" # Master port
+  #   volumes:
+  #      - ./spark/scripts:/opt/bitnami/spark/pyspark_scripts
+  #      - ./spark/logs:/opt/bitnami/spark/logs
+  #      - ./spark/db_connectors:/opt/bitnami/spark/db_connectors
   
   # spark-worker-a:
   #   image: bitnami/spark:3.0.0
