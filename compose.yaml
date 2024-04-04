@@ -1,25 +1,18 @@
 services:
   db:
-    image: postgres:14.5
+    image: postgres:16.2
     container_name: postgres_c
     restart: always
     # set shared memory limit when using docker-compose
     shm_size: 128mb
     environment:
       - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=abc
+      - POSTGRES_PASSWORD=root
     ports:
       - 5432:5432
     volumes:
        - ./database/scripts:/psql_scripts
-       - ./database/config:/tmp
-
-  adminer:
-    image: adminer
-    container_name: adminer_c
-    restart: always
-    ports:
-      - 8080:8080
+       - ./database/config_v16.2:/tmp
       
   # spark-master:
   #   image: bitnami/spark:3.0.0
@@ -30,8 +23,8 @@ services:
   #     - SPARK_WORKER_MEMORY=1G
   #     - SPARK_DRIVER_MEMORY=1G
   #     - SPARK_EXECUTOR_MEMORY=1G
-  #     - AWS_ACCESS_KEY_ID= 
-  #     - AWS_SECRET_ACCESS_KEY= 
+  #     - AWS_ACCESS_KEY_ID=-
+  #     - AWS_SECRET_ACCESS_KEY=-
   #     - AWS_DEFAULT_REGION=ap-southeast-1
   #   command:
   #     #

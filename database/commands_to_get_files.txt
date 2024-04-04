@@ -1,0 +1,5 @@
+docker run --name postgres_c -e POSTGRES_PASSWORD=abc -d postgres
+docker cp postgres_c:/var/lib/postgresql/data/pg_hba.conf .
+docker cp postgres_c:/var/lib/postgresql/data/postgresql.conf .
+docker cp database/config/pg_hba.conf postgres_c:/var/lib/postgresql/data/pg_hba.conf
+docker restart postgres_c

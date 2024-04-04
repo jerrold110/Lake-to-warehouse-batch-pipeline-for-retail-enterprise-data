@@ -3,6 +3,8 @@ drop table dim_store;
 drop table dim_film;
 drop table dim_date;
 drop table dim_customer;
+drop index idx_df_film_id;
+drop index idx_df_rating;
 
 CREATE TABLE IF NOT EXISTS dim_film (
     film_id INT,
