@@ -14,41 +14,41 @@ services:
        - ./database/scripts:/psql_scripts
        - ./database/config_v16.2:/tmp
       
-  # spark-master:
-  #   image: bitnami/spark:3.0.0
-  #   container_name: spark_master
-  #   environment:
-  #     - SPARK_MODE=master
-  #     - SPARK_WORKER_CORES=1
-  #     - SPARK_WORKER_MEMORY=1G
-  #     - SPARK_DRIVER_MEMORY=1G
-  #     - SPARK_EXECUTOR_MEMORY=1G
-  #     - AWS_ACCESS_KEY_ID=-
-  #     - AWS_SECRET_ACCESS_KEY=-
-  #     - AWS_DEFAULT_REGION=ap-southeast-1
-  #   command:
-  #     #
-  #   ports:
-  #     - "8080:8080" # Master web ui
-  #     - "7077:7077" # Master port
-  #   volumes:
-  #      - ./spark/scripts:/opt/bitnami/spark/pyspark_scripts
-  #      - ./spark/logs:/opt/bitnami/spark/logs
-  #      - ./spark/db_connectors:/opt/bitnami/spark/db_connectors
+  spark-master:
+    image: bitnami/spark:3.0.0
+    container_name: spark_master
+    environment:
+      - SPARK_MODE=master
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_DRIVER_MEMORY=1G
+      - SPARK_EXECUTOR_MEMORY=1G
+      - AWS_ACCESS_KEY_ID=
+      - AWS_SECRET_ACCESS_KEY=p
+      - AWS_DEFAULT_REGION=ap-southeast-1
+    command:
+      #
+    ports:
+      - "8080:8080" # Master web ui
+      - "7077:7077" # Master port
+    volumes:
+       - ./spark/scripts:/opt/bitnami/spark/pyspark_scripts
+       - ./spark/logs:/opt/bitnami/spark/logs
+       - ./spark/db_connectors:/opt/bitnami/spark/db_connectors
   
-  # spark-worker-a:
-  #   image: bitnami/spark:3.0.0
-  #   environment:
-  #     - SPARK_MODE=worker
-  #     - SPARK_MASTER_URL=spark://spark-master:7077
-  #     - SPARK_WORKER_CORES=1
-  #     - SPARK_WORKER_MEMORY=1G
-  #     - SPARK_DRIVER_MEMORY=1G
-  #     - SPARK_EXECUTOR_MEMORY=1G
-  #   command:
-  #     #
-  #   depends_on:
-  #     - spark-master
+  spark-worker-a:
+    image: bitnami/spark:3.0.0
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_DRIVER_MEMORY=1G
+      - SPARK_EXECUTOR_MEMORY=1G
+    command:
+      #
+    depends_on:
+      - spark-master
 
   # spark-worker-b:
   #   image: bitnami/spark:3.0.0

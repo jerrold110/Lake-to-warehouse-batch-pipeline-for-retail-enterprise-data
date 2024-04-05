@@ -10,7 +10,10 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, isnan, when, count
 
 def validate_data(file, batch_date):
-	spark = SparkSession.builder.appName(f"Validate {file}").getOrCreate()
+	spark = SparkSession.builder\
+		.appName(f"Validate {file}")\
+		.master('spark://spark-master:7077')\
+		.getOrCreate()
 	
 	s3_path = f"s3a://dvd-rental-data/transaction_data/{batch_date}/{file}"
 

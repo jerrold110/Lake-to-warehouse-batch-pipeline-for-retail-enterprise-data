@@ -22,7 +22,7 @@ def check_postgresql_connection(host, port, dbname, user, password):
 # Replace these variables with your PostgreSQL connection details
 host = 'localhost'  # Hostname or IP address
 port = '5432'       # Port number
-dbname = 'dvd_database'  # Name of your database
+dbname = 'postgres'  # Name of your database
 user = 'abc'         # Your username
 password = 'abc'    # Your password
 
