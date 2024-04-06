@@ -11,9 +11,9 @@ def transform(batch_date:str):
     
     # Read data
 
-    # Cache
+    # Read dimension table from database
 
-    # Apply transformations
+    # Apply transformations with filter
 
     # Write data to db
 

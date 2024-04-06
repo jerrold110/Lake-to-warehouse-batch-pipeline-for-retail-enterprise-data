@@ -3,8 +3,6 @@ drop table dim_store;
 drop table dim_film;
 drop table dim_date;
 drop table dim_customer;
-drop index idx_df_film_id;
-drop index idx_df_rating;
 
 CREATE TABLE IF NOT EXISTS dim_film (
     film_id INT,
@@ -18,6 +16,7 @@ CREATE TABLE IF NOT EXISTS dim_film (
     rating CHAR(20),
     language CHAR(50),
     category CHAR(255),
+    insert_date DATE,
     PRIMARY KEY (film_id)
     --CONSTRAINT unique_film_id UNIQUE (film_id)
 );
@@ -33,6 +32,7 @@ CREATE TABLE IF NOT EXISTS dim_customer(
     district VARCHAR(50),
     city VARCHAR(50),
     country VARCHAR(50),
+    insert_date DATE,
     PRIMARY KEY (customer_id)
 );
 CREATE INDEX idx_dc_customer_id ON dim_customer(customer_id);
@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS dim_store(
     postal_code INT,
     city CHAR(50),
     country CHAR(50),
+    insert_date DATE,
     PRIMARY KEY (store_id)
 );
 CREATE INDEX idx_ds_store_id ON dim_store(store_id);
@@ -75,6 +76,7 @@ CREATE TABLE IF NOT EXISTS fact_sale(
     sale_amount DECIMAL(10,2),
     rental_date TIMESTAMP,
     return_date TIMESTAMP,
+    batch_date DATE,
     -- primary and foreign keys of the fact table
     PRIMARY KEY (payment_id, payment_date),
     FOREIGN KEY (customer_id) REFERENCES dim_customer(customer_id),
