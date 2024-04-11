@@ -94,3 +94,7 @@ CREATE INDEX idx_fs_payment_date on fact_sale(payment_date);
 CREATE INDEX idx_fs_customer_id ON fact_sale(customer_id);
 CREATE INDEX idx_fs_film_id ON fact_sale(film_id);
 CREATE INDEX idx_fs_store_id ON fact_sale(store_id);
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO abc;
+--GRANT ALL PRIVILEGES ON DATABASE dvd_database TO abc;
+--GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO abc;

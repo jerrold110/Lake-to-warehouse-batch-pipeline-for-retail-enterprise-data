@@ -68,6 +68,7 @@ def transform(batch_date:str):
 
     # Read dimension table from database
     dim_store = read_db(spark, 'dim_store')
+    print('dim_store: ')
     dim_store.show()
     dim_store.printSchema()
 
@@ -92,23 +93,27 @@ def transform(batch_date:str):
         on c.country_id = co.country_id
     """
     )
-    df_store.show()
     assert df_store.count() != 0
 
-    data_columns = ['store_id'
+    data_columns = ['store_id',
                     'address',
                     'district',
                     'postal_code',
                     'city',
                     'country']
-    df_store.show(); df_store.printSchema()
+    df_store.show()
     df_store = df_store.join(dim_store, data_columns, 'left_anti')
-    df_store.show(); df_store.printSchema()
-    df_store = df_store.with_column('insert_date', lit(datetime(batch_date).cast(DateType())))
+    df_store.show()
+    # Batch date requires an int
+    df_store = df_store.withColumn('insert_date', lit(datetime.strptime(batch_date, '%Y-%m-%d').date()))
     df_store.show(); df_store.printSchema()
 
     # Write data to db
-    write_db(spark, df_store, 'dim_store')
+    if df_store.count() != 0:
+        write_db(df_store, 'dim_store')
+        print('Write complete')
+    else:
+        print('Nothing to write')
 
     spark.stop()
 

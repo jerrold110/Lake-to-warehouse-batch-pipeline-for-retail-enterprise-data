@@ -4,32 +4,27 @@ from pyspark.sql import SparkSession
 
 def read_db(spark, table:str):
 
-    try:
-        df = spark.read.format('jdbc')\
+    df = spark.read.format('jdbc')\
             .option('url', 'jdbc:postgresql://postgres-db:5432/dvd_database')\
             .option('dbtable', table)\
             .option('driver', 'org.postgresql.Driver')\
             .option('user', 'abc')\
             .option('password', 'abc')\
             .load()
-    except py4j.protocol.Py4JJavaError as e:
-        print(e)
-    except Exception as e:
-        print('Error:',e)
-    
+
     return df
 
-def write_db(spark, df:pyspark.sql.dataframe.DataFrame, db_table:str):
+def write_db(df:pyspark.sql.dataframe.DataFrame, db_table:str):
 
     try:
-        spark.write.format('jdbc')\
+        df.write.format('jdbc').mode('append')\
         .option('url', 'jdbc:postgresql://postgres-db:5432/dvd_database')\
         .option('dbtable', db_table)\
         .option('driver', 'org.postgresql.Driver')\
         .option('user', 'abc')\
         .option('password', 'abc')\
         .option('isolationlevel', 'SERIALIZABLE')\
-        .load()
+        .save()
     except py4j.protocol.Py4JJavaError as e:
         print(e)
     except Exception as e:
