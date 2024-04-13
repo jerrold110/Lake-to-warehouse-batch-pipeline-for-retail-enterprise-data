@@ -19,7 +19,7 @@ def transform(batch_date:str):
     logger.LogManager.getLogger('akka').setLevel(logger.Level.ERROR)
     
     # Read data
-    df_add = spark.read.options(header='true', inferSchema='true') \
+    df_add = spark.read.options(header='true') \
     .csv(path=f"s3a://dvd-rental-data/dimension_data/address.csv",
         schema=StructType([
             StructField('address_id', IntegerType(), True),
@@ -32,7 +32,7 @@ def transform(batch_date:str):
             StructField('last_update', TimestampType(), True)
         ]))
     
-    df_cs = spark.read.options(header='true', inferSchema='true') \
+    df_cs = spark.read.options(header='true') \
     .csv(path=f"s3a://dvd-rental-data/dimension_data/customer.csv",
          schema=StructType([
             StructField('customer_id', IntegerType(), True),
@@ -47,7 +47,7 @@ def transform(batch_date:str):
             StructField('active', FloatType(), True)
          ]))
     
-    df_co = spark.read.options(header='true', inferSchema='true') \
+    df_co = spark.read.options(header='true') \
     .csv(path=f"s3a://dvd-rental-data/dimension_data/country.csv",
          schema=StructType([
             StructField('country_id', IntegerType(), True),
@@ -55,7 +55,7 @@ def transform(batch_date:str):
             StructField('last_update', TimestampType(), True)
          ]))
 
-    df_cy = spark.read.options(header='true', inferSchema='true') \
+    df_cy = spark.read.options(header='true') \
         .csv(path=f"s3a://dvd-rental-data/dimension_data/city.csv",
             schema=StructType([
                 StructField('city_id', IntegerType(), True),
@@ -64,7 +64,7 @@ def transform(batch_date:str):
                 StructField('last_update', TimestampType(), True)
             ]))
 
-    df_st = spark.read.options(header='true', inferSchema='true') \
+    df_st = spark.read.options(header='true') \
     .csv(path=f"s3a://dvd-rental-data/dimension_data/store.csv",
          schema=StructType([
             StructField('store_id', IntegerType(), True),
@@ -84,14 +84,12 @@ def transform(batch_date:str):
     df_add_cache.createOrReplaceTempView('address')
     df_cy_cache.createOrReplaceTempView('city')
     df_co_cache.createOrReplaceTempView('country')
+    df_cs.createOrReplaceTempView('customer')
     df_st.createOrReplaceTempView('store')
 
     # Read dimension table from database
     dim_store = read_db(spark, 'dim_store')
     dim_customer = read_db(spark, 'dim_customer')
-    print('dim_customer: ')
-    dim_customer.show()
-    dim_customer.printSchema()
 
     ##### FIRST STORE TABLE THEN CUSTOMER TABLE #######
     # Apply transformations with filter
@@ -126,12 +124,10 @@ def transform(batch_date:str):
                     'postal_code',
                     'city',
                     'country']
-    df_store.show()
     df_store = df_store.join(dim_store, data_columns, 'left_anti')
-    df_store.show()
     df_store = df_store.withColumn('insert_date', lit(datetime.strptime(batch_date, '%Y-%m-%d').date()))
-    df_store.show(); df_store.printSchema()
-    #######################################################################################
+    #######################################################################################4
+
     df_customer = spark.sql(
     """
     select
@@ -157,18 +153,17 @@ def transform(batch_date:str):
     except AssertionError as e:
         print("Error:", e)
 
-    data_columns = ['store_id',
+    data_columns = ['customer_id',
+                    'first_name',
+                    'last_name',
+                    'active',
                     'address',
                     'district',
-                    'postal_code',
                     'city',
                     'country']
-    df_customer.show()
     df_customer = df_customer.join(dim_customer, data_columns, 'left_anti')
-    df_customer.show()
     df_customer = df_customer.withColumn('insert_date', lit(datetime.strptime(batch_date, '%Y-%m-%d').date()))
-    df_customer.show(); df_customer.printSchema()
-    aaa
+
     # Write data to db
     if df_store.count() != 0:
         write_db(df_store, 'dim_store')
@@ -176,7 +171,11 @@ def transform(batch_date:str):
     else:
         print('Nothing to write')
 
-    
+    if df_customer.count() != 0:
+        write_db(df_customer, 'dim_customer')
+        print('Write complete')
+    else:
+        print('Nothing to write')
 
     spark.stop()
 

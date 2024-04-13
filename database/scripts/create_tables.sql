@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS fact_sale(
     sale_amount DECIMAL(10,2),
     rental_date TIMESTAMP,
     return_date TIMESTAMP,
-    batch_date DATE,
+    insert_date DATE,
     -- primary and foreign keys of the fact table
     PRIMARY KEY (payment_id, payment_date),
     FOREIGN KEY (customer_id) REFERENCES dim_customer(customer_id),

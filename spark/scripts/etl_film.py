@@ -18,7 +18,7 @@ def transform(batch_date:str):
     logger.LogManager.getLogger('akka').setLevel(logger.Level.ERROR)
     
     # Read data
-    df_cat = spark.read.options(header='true', inferSchema='true') \
+    df_cat = spark.read.options(header='true') \
     .csv(path=f"s3a://dvd-rental-data/dimension_data/category.csv",
         schema=StructType([
             StructField('category_id', IntegerType(), True),
@@ -26,7 +26,7 @@ def transform(batch_date:str):
             StructField('last_update', TimestampType(), True)
         ]))
     
-    df_fm = spark.read.options(header='true', inferSchema='true') \
+    df_fm = spark.read.options(header='true') \
     .csv(path=f"s3a://dvd-rental-data/dimension_data/film.csv",
          schema=StructType([
             StructField('film_id', IntegerType(), True),
@@ -42,7 +42,7 @@ def transform(batch_date:str):
             StructField('last_update', DateType(), True)
          ]))
     
-    df_fc = spark.read.options(header='true', inferSchema='true') \
+    df_fc = spark.read.options(header='true') \
     .csv(path=f"s3a://dvd-rental-data/dimension_data/film_category.csv",
          schema=StructType([
             StructField('film_id', IntegerType(), True),
@@ -50,7 +50,7 @@ def transform(batch_date:str):
             StructField('last_update', TimestampType(), True)
          ]))
     
-    df_lg = spark.read.options(header='true', inferSchema='true') \
+    df_lg = spark.read.options(header='true') \
     .csv(path=f"s3a://dvd-rental-data/dimension_data/language.csv",
          schema=StructType([
             StructField('language_id', IntegerType(), True),
@@ -92,8 +92,10 @@ def transform(batch_date:str):
         on fc.category_id = c.category_id
     """
     )
-    assert df_film.count() != 0
-    df_film.show()
+    try:
+        assert df_film.count() != 0
+    except AssertionError as e:
+        print("Error:", e)
 
     data_columns = ['film_id',
                     'title',

@@ -1,5 +1,6 @@
 
-docker cp spark/scripts/transform_store.py spark_master:opt/spark/bin/pyspark_scripts/transform_store.py
+docker cp spark/scripts/transform_storecustomer.py spark_master:opt/spark/bin/pyspark_scripts/transform_storecustomer.py
 docker cp spark/scripts/transform_film.py spark_master:opt/spark/bin/pyspark_scripts/transform_film.py
+docker cp spark/scripts/etl_date.py spark_master:opt/spark/bin/pyspark_scripts/etl_date.py
 
 docker exec -it spark_master bash 

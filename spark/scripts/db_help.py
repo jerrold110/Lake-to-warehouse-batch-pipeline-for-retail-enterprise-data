@@ -1,6 +1,10 @@
+"""
+This file contains read and write helper functions for the database
+
+"""
 import py4j
 import pyspark
-from pyspark.sql import SparkSession    
+from pyspark.sql import SparkSession
 
 def read_db(spark, table:str):
 
