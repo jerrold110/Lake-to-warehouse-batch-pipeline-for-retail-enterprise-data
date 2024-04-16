@@ -1,10 +1,10 @@
 # Lake to warehouse batch pipeline for retail enterprise data
 
 # Run this project
-'
+'''
 Docker compose up -d
 ./setup.sh
-'
+'''
 
 ## The data
 ### Data flow diagram
