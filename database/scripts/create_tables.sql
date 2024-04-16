@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS dim_film (
     language CHAR(50),
     category CHAR(255),
     insert_date DATE,
-    PRIMARY KEY (film_id)
-    --CONSTRAINT unique_film_id UNIQUE (film_id)
+    PRIMARY KEY (film_id, insert_date),
+    CONSTRAINT unique_film_id UNIQUE (film_id)  -- This is to enable film_id as a foreign key
 );
 CREATE INDEX idx_df_film_id ON dim_film(film_id);
 CREATE INDEX idx_df_rating ON dim_film(rating);
@@ -33,11 +33,27 @@ CREATE TABLE IF NOT EXISTS dim_customer(
     city VARCHAR(50),
     country VARCHAR(50),
     insert_date DATE,
-    PRIMARY KEY (customer_id)
+    PRIMARY KEY (customer_id, insert_date),
+    CONSTRAINT unique_customer_id UNIQUE (customer_id)
 );
 CREATE INDEX idx_dc_customer_id ON dim_customer(customer_id);
 CREATE INDEX idx_dc_city ON dim_customer(city);
 CREATE INDEX idx_dc_country ON dim_customer(country);
+
+CREATE TABLE IF NOT EXISTS dim_store(
+    store_id INT,
+    address CHAR(255),
+    district CHAR(255),
+    postal_code INT,
+    city CHAR(50),
+    country CHAR(50),
+    insert_date DATE,
+    PRIMARY KEY (store_id, insert_date),
+    CONSTRAINT unique_store_id UNIQUE (store_id)
+);
+CREATE INDEX idx_ds_store_id ON dim_store(store_id);
+CREATE INDEX idx_ds_city ON dim_store(city);
+CREATE INDEX idx_ds_country ON dim_store(country);
 
 CREATE TABLE IF NOT EXISTS dim_date(
     date TIMESTAMP,
@@ -52,20 +68,6 @@ CREATE TABLE IF NOT EXISTS dim_date(
 CREATE INDEX idx_dd_datekey ON dim_date(datekey);
 CREATE INDEX idx_dd_year_month ON dim_date(year, month);
 
-CREATE TABLE IF NOT EXISTS dim_store(
-    store_id INT,
-    address CHAR(255),
-    district CHAR(255),
-    postal_code INT,
-    city CHAR(50),
-    country CHAR(50),
-    insert_date DATE,
-    PRIMARY KEY (store_id)
-);
-CREATE INDEX idx_ds_store_id ON dim_store(store_id);
-CREATE INDEX idx_ds_city ON dim_store(city);
-CREATE INDEX idx_ds_country ON dim_store(country);
-
 -- Create Partitions on payment_date
 CREATE TABLE IF NOT EXISTS fact_sale(
     payment_id INT,
@@ -78,7 +80,7 @@ CREATE TABLE IF NOT EXISTS fact_sale(
     return_date TIMESTAMP,
     insert_date DATE,
     -- primary and foreign keys of the fact table
-    PRIMARY KEY (payment_id, payment_date),
+    PRIMARY KEY (payment_id, payment_date), -- payment_date is necessary to partition on payment_date
     FOREIGN KEY (customer_id) REFERENCES dim_customer(customer_id),
     FOREIGN KEY (film_id) REFERENCES dim_film(film_id),
     FOREIGN KEY (store_id) REFERENCES dim_store(store_id)
