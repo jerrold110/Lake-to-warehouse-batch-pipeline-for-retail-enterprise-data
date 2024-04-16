@@ -114,7 +114,7 @@ def transform(batch_date:str):
     
     # Write data to db
     if df_film.count() != 0:
-        write_db(df_film, 'dim_film')
+        write_db(df_film, 'dim_film') # Pyspark does not recognise ON CONFLICT (film_id, insert_date) DO NOTHING
         print('Write complete')
     else:
         print('Nothing to write')
