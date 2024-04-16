@@ -4,10 +4,10 @@
 ```
 Docker compose up -d
 ./setup.sh
-```
-Spark UI: 8080
-Airflow Webserver: 8081
 
+# Spark UI: 8080
+# Airflow Webserver: 8081
+```
 
 ## The data
 ### Data flow diagram
