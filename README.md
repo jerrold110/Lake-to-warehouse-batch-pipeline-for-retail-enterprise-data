@@ -2,20 +2,21 @@
 
 #### Run this project
 ```
-Docker compose up -d
+docker compose up -d
 ./setup.sh
 
-# Spark UI: 8080
-# Airflow Webserver: 8081
+# Spark UI: localhost:8080
+# Airflow Webserver: localhost:8081
 ```
 
 ## The data
 ### Data flow diagram
+### Dag, steps in each task, and daily pipeline timeline
 ### Source (Lake)
 ### Sink (Warehouse)
 
 ## The Pipeline
-### Dag and steps in each task
+### Spark and AWS
 ### Replayability, Overwritability, and Idempotency
 
 
