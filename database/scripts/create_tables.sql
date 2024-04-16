@@ -63,7 +63,8 @@ CREATE TABLE IF NOT EXISTS dim_date(
     day INT,
     quarter INT,
     dayofweek INT,
-    PRIMARY KEY (datekey)
+    PRIMARY KEY (datekey),
+    CONSTRAINT unique_date UNIQUE (date)
 );
 CREATE INDEX idx_dd_datekey ON dim_date(datekey);
 CREATE INDEX idx_dd_year_month ON dim_date(year, month);
@@ -83,7 +84,10 @@ CREATE TABLE IF NOT EXISTS fact_sale(
     PRIMARY KEY (payment_id, payment_date), -- payment_date is necessary to partition on payment_date
     FOREIGN KEY (customer_id) REFERENCES dim_customer(customer_id),
     FOREIGN KEY (film_id) REFERENCES dim_film(film_id),
-    FOREIGN KEY (store_id) REFERENCES dim_store(store_id)
+    FOREIGN KEY (store_id) REFERENCES dim_store(store_id),
+    FOREIGN KEY (payment_date) REFERENCES dim_date(date),
+    FOREIGN KEY (rental_date) REFERENCES dim_date(date),
+    FOREIGN KEY (return_date) REFERENCES dim_date(date)
 )
 PARTITION BY RANGE (payment_date);
 -- Partition tables with declarative partitioning
