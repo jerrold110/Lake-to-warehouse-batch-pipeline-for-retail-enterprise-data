@@ -26,13 +26,9 @@ def validate_data(file, batch_date):
 		# Other actions such as logging
 
 	# Clean the data and report any errors in the data through logs (airflow or python)
-	missing_count_by_col_df = df.select([count(when(col(c).contains('None') | \
-												col(c).contains('NULL') | \
-												(col(c) == '' ) | \
-												col(c).isNull() | \
-												isnan(c), c 
-											)).alias(c)
-											for c in df.columns])
+	missing_count_by_col_df = df.select([count(
+		when(col(c).contains('None') | col(c).contains('NULL') | (col(c) == '' ) | col(c).isNull() | isnan(c), c 
+	   )).alias(c) for c in df.columns])
 	# Some logging for the number of missing values in each column
 	for i, c in enumerate(missing_count_by_col_df.columns):
 		print(c, missing_count_by_col_df.collect()[0][i])
