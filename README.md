@@ -1,10 +1,13 @@
 # Lake to warehouse batch pipeline for retail enterprise data
 
-# Run this project
-'''
+#### Run this project
+```
 Docker compose up -d
 ./setup.sh
-'''
+```
+Spark UI: 8080
+Airflow Webserver: 8081
+
 
 ## The data
 ### Data flow diagram
