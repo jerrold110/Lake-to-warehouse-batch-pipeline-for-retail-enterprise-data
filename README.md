@@ -10,7 +10,7 @@ docker compose up -d
 # Warehouse (PostgreSQL): localhost:5432
 ```
 ## Overview
-In this system, a DVD rental retail enterprise wants to large amounts of load operational data into a data warehouse (dimensional model) from data stored in various different parts of their system on a daily basis for data analysis/business intelligence. The data pipeline has to be **idempotent, scalable, low cloud-cost, and automated** with Type 2 Slowly Changing Dimension so as to not lose data in the past as dimensions are updated. Tech used is Spark, S3, PostgreSQL, Airflow, Docker compose.
+In this system, a DVD rental retail enterprise wants to load large amounts of operational data into a data warehouse (dimensional model) from data stored in various different parts of their system on a daily basis, for data analysis/business intelligence. The data pipeline has to be **idempotent, scalable, low cloud-cost, and automated** with Type 2 Slowly Changing Dimension so as to not lose data in the past as dimensions are updated. Tech used is Spark, S3, PostgreSQL, Airflow, Docker compose.
 
 Components:
 - Data lake (assume the data from various sources are consolidated here before pipeline begins)
