@@ -11,7 +11,6 @@ docker restart postgres_c
 # docker exec -it postgres_c cat /var/lib/postgresql/data/pg_hba.conf
 # docker exec -it postgres_c psql -U abc -d dvd_database
 # docker exec -it postgres_c psql -U root -d dvd_database
-
 # docker exec spark_master cp -f /opt/bitnami/spark/db_connectors/postgresql-42.7.3.jar /opt/bitnami/spark/jars/postgresql-42.7.3.jar
 
 echo '*********Set up done***********'

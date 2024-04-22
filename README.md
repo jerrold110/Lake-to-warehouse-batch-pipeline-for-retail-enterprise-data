@@ -10,7 +10,7 @@ docker compose up -d
 # Warehouse (PostgreSQL): localhost:5432
 ```
 ## Overview
-In this system, a DVD rental retail enterprise wants to load operational data into a data warehouse (dimensional model) from data stored in various different parts of their system on a daily basis for data analysis/business intelligence. The data pipeline has to be <u>idempotent, scalable, low cloud-cost, and automated</u> with Type 2 Slowly Changing Dimension so as to not lose data in the past as dimensions are updated.
+In this system, a DVD rental retail enterprise wants to large amounts of load operational data into a data warehouse (dimensional model) from data stored in various different parts of their system on a daily basis for data analysis/business intelligence. The data pipeline has to be **idempotent, scalable, low cloud-cost, and automated** with Type 2 Slowly Changing Dimension so as to not lose data in the past as dimensions are updated. Tech used is Spark, S3, PostgreSQL, Airflow, Docker compose.
 
 Components:
 - Data lake (assume the data from various sources are consolidated here before pipeline begins)
@@ -53,7 +53,7 @@ This is a replayable data source for up to 14 days (storage concerns) and is an 
 ### Sink (Warehouse)
 The Data warehouse uses Kimball dimensional modelling. The fact table contains the base fact data (sale) and the dimensional tables contain dimensions of that fact. Dimensional tables has an insert_date column for SCD, which is also used in the primary key value. Fact table has a unique key payment_id (payment_date is included in PK because this table is partitioned on payment_date).
 
-Dimension tables are upserted before insert into fact table so as to preserve foreign key RI constraints. There are indexes and partitions on this table schema to improve query performance more details are in `database/scripts/create_tables.sql`
+Dimension tables are upserted before insert into fact table so as to preserve foreign key RI constraints. There are indexes and partitions on this table schema to improve query performance more details are in `database/scripts/create_tables.sql`. During deployment of system a new user ABC is created for the Spark cluster to read and write data to Postgres instead of root user.
 
 ![Data](/images/Database%20schema.png "Database")
 
