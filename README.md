@@ -62,7 +62,7 @@ Cleaning:
 1. Clean data in staging area
 2. store it in transaction_data/batch_date/cleaned_data folder to preserve a copy of pre-validated data for investigation in pipeline failure autopsy
 
-Dimensional transformation (improvments suggested in final section):
+Dimensional transformation (improvments suggested in final section. Spark SQL does not recognise ON CONFLICT (col1) DO NOTHING):
 1. Transform dimensional data
 2. Read table from database
 3. Remove duplicate rows from data (updated rows and new IDs are not removed, unchanged data is removed)
