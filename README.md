@@ -86,6 +86,7 @@ This pipelne has to be idempotent (Running a data pipeline numerous times with t
 
 ## Potential improvements to this project
 A quick word on how the technical functionality of this project can be improved with different setups.
+- Data validation/cleaning should be done upon moving data to the S3 staging area for ETL from its source (limitations in this project)
 - It is more efficient to use a hashing function to create a new column to deduplicate data instead of checking every field value in a row, while maintaining SCD Type 2 and Idempotency
 - Research has to be done to find better ways to not transform dimensional data without transforming entities where no updates were made. A large amount of resources is spent every day transforming dimensional data, scanning for entities that are not new/updated, and excluding them from the database write. Perhaps a kind of monitoring system that monitors for entities which were updated, then the pipeline only transforms those entities and new additions to the database.
 - Use a Columnar store database (Redshift/Snowflake/Bigquery) as the data warehouse for better query performance on big data
