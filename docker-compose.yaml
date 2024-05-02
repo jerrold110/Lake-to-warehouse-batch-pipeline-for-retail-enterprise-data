@@ -59,6 +59,8 @@ services:
   spark-master:
     image: bitnami/spark:3.0.0
     container_name: spark_master
+    depends_on:
+      - postgres-db
     environment:
       - SPARK_MODE=master
       - SPARK_WORKER_CORES=1
