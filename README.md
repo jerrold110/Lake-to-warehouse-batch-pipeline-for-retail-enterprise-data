@@ -9,7 +9,7 @@ docker compose up -d
 # Airflow Webserver: localhost:8081
 ```
 
-## The data
+## The data moving in the pipeline 
 ### Data flow diagram
 ### Dag, steps in each task, and daily pipeline timeline
 ### Source (Lake)
@@ -18,5 +18,10 @@ docker compose up -d
 ## The Pipeline
 ### Spark and AWS
 ### Replayability, Overwritability, and Idempotency
+
+## Possible improvements
+### Kubernetes spark cluster
+### 
+
 
 
