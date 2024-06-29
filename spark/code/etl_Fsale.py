@@ -66,9 +66,11 @@ def transform(batch_date:str):
     df_rt.createOrReplaceTempView('rental')
     df_sf.createOrReplaceTempView('staff')
 
-    # Read dimension table from database
+    # Read fact table from database
+    fact_sale = read_db(spark, 'fact_sale')
 
     # Apply transformations with filter
+        # Find rows in df with duplicate exact in dim. Remove entirely. Left with new/updated rows
         # Add insert_date to remaining rows in df
     df_sale = spark.sql(
     """
@@ -95,6 +97,9 @@ def transform(batch_date:str):
     except AssertionError as e:
         print("Error:", e)
 
+    data_columns = ['payment_id']
+
+    df_sale = df_sale.join(fact_sale, data_columns, 'left_anti')
     df_sale = df_sale.withColumn('insert_date', lit(datetime.strptime(batch_date, '%Y-%m-%d').date()))
     df_sale.printSchema()
     df_sale.show()

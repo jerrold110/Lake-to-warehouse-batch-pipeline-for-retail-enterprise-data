@@ -10,7 +10,7 @@ docker compose up -d
 # Warehouse (PostgreSQL): localhost:5432
 ```
 ## Overview
-In this system, a DVD rental retail enterprise wants to load large amounts of operational data into a data warehouse (dimensional model) from data stored in various different parts of their system on a daily basis, for data analysis/business intelligence. The data pipeline has to be **idempotent, scalable, low cloud-cost, and automated** with Type 2 Slowly Changing Dimension so as to not lose data in the past as dimensions are updated. Tech used is Spark, S3, PostgreSQL, Airflow, Docker compose.
+In this system, a DVD rental retail enterprise wants to load large amounts of operational data into a data warehouse (dimensional model) from data stored in various different parts of their system on a daily basis, for data analysis/business intelligence. The data pipeline has to be **idempotent, scalable, low cloud-cost, and automated with Type 2 Slowly Changing Dimension** so as to not lose data in the past as dimensions are updated. Tech used is Spark, S3, PostgreSQL, Airflow, Docker compose.
 
 Components:
 - Data lake (assume the data from various sources are consolidated here before pipeline begins)
@@ -40,23 +40,32 @@ The pipeline runs on an automated schedule every day after the storage of the pr
 - 06:00 Pipeline is completed and status of the Airflow tasks are logged. Pipeline is either success or fail. Data Mart is updated only if entire pipeline is a success.
 
 ### DAG on Airflow
-This diagram shows the DAG of the tasks in this pipeline and how airflow orchestrates them. There are data validation tasks for the day's data to ensure that data is clean and available for transformation. This should be extended for dimensional data as well, not just transactional data. ETL tasks (cashing, deduplication, transformation, load) which operate on dimensional table data BEFORE fact table data so as to meet referential integrity constraints in the DWH. The only variable in this batch pipeline is the date of the previous day (batch_date or insert_date), this is for sink overwritability (fact tables) and SCD T2 (dimension tables) as well as general logging.
+This diagram shows the DAG of the tasks in this pipeline and how airflow orchestrates them. There are data validation tasks for the day's data to ensure that data is clean and available for transformation. ETL tasks (caching, deduplication, transformation, load) which operate on dimensional table data BEFORE fact table data so as to meet referential integrity constraints in the DWH. The only variable in this batch pipeline is the date of the previous day (batch_date or insert_date), this is for sink overwritability (fact tables) and SCD T2 (dimension tables) as well as general logging.
 
 ![Data](/images/Dag.png "Airflow graph of tasks")
 
-### Source (Lake)
+### Source (Data Lake)
 This is a replayable data source for up to 14 days (storage concerns) and is an Amazon S3 bucket. Every day data from the previous day is moved to this central location in a folder named after the date that represents the day the the data is from. Today is May 1st 2007 so we are processing the data generated on April 30th 2007 in the morning before working hours. The entire tables for dimensional data is written because dimensions can change (eg: customer changes details, store changes location, product rating changes) and the processing system has to detect these changes by comparing them with existing data in dimensional tables to maintain SCD T2. **This is not the most efficient system and suggestions for improvement are written at the end**
 
 ![Data](/images/Lake1.png "Lake1")
 ![Data](/images/Lake2.png "Lake2")
 ![Data](/images/Lake3.png "Lake3")
 
-### Sink (Warehouse)
-The Data warehouse uses Kimball dimensional modelling. The fact table contains the base fact data (sale) and the dimensional tables contain dimensions of that fact. Dimensional tables has an insert_date column for SCD, which is also used in the primary key value. Fact table has a unique key payment_id (payment_date is included in PK because this table is partitioned on payment_date).
+### Sink and identifiers (Data warehouse)
+The Data warehouse uses Kimball dimensional modelling. The fact table contains the base fact data (sale) and the dimensional tables contain dimensions of that fact. Dimensional tables has an insert_date column for SCD in the dimension table, which is also used in the primary key value. Fact table has a unique key payment_id **(payment_date is included in PK because this table is partitioned on payment_date)**.
 
 Dimension tables are upserted before insert into fact table so as to preserve foreign key RI constraints. There are indexes and partitions on this table schema to improve query performance more details are in `database/scripts/create_tables.sql`. During deployment of system a new user ABC is created for the Spark cluster to read and write data to Postgres instead of root user.
 
 ![Data](/images/Database%20schema.png "Database")
+
+### Idempotency, identifiers, and upserting into a Star schema
+Idempotent involves ensuring that running the same pipeline multiple times with the same input does not result in duplicate or inconsistent data. This pipelne has to be idempotent becauese of real world errors that may occur and need to be fixed. Errors include writing wrong/duplicate data, batch job failures, partial writes, and so on. Idempotency allows us to go back and fix these errors in the data. 
+
+To ensure idempotency with Type 2 SCD, a combination of id key and batch_date is used in the tables. The parameter of the batch job `batch_date` allows the pipeline to detect new/updated records. 
+
+In the dimension tables there is a check to see if duplicate rows on (id, data) exist before inserting rows. There may be more than 1 value of id since we are tracking changes across time.
+
+In the fact table, there is a check on (id) to check for duplicate rows, and there are no checks for updated rows as it is transactional in nature.
 
 ### Steps in the Pipeline: Cleaning, ETL, caching, deplication
 Cleaning: 
@@ -80,10 +89,6 @@ Transaction transformation:
 To minimize usage of storage space, the storage layer of the spark cluster is the AWS S3 staging area. I used the Hadoop-AWS integration module to connect my local spark cluster to AWS S3 (the required .jar files are in the Bitnami spark image). 
 
 Pyspark scripts for each task in the pipeline are bind mounted to the Spark master node image. Airflow submits these scripts to Spark to run each task from validation to ETL.
-
-### Replayability, Overwritability, and Idempotency
-This pipelne has to be idempotent (Running a data pipeline numerous times with the same inputs will not create any duplicates or schema changes) becauese of real world errors that may occur and need to be fixed. Errors include writing wrong/duplicate data, batch job failures, partial writes, and so on. Idempotency allows us to go back and fix these errors in the data. Idempotency requires a **replayable source and overwritable sink**
-
 
 ## Potential improvements to this project
 A quick word on how the technical functionality of this project can be improved with different setups.
